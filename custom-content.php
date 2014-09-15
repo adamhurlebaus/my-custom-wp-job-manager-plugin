@@ -1,10 +1,8 @@
 <?php
 /**
  * Plugin Name: WP Job Manager - My Custom Content
- * Plugin URI:  http://www.multi-bids.com
  * Description: A modification of Astoundify's first Pre-Defined Regions Plugin.  Loads my custom content to WP Job Manager
  * Author:      Adam Hurlebaus
- * Author URI:  http://www.multi-bids.com
  * Version:     1.0.2
  * Text Domain: mcjm
  */
