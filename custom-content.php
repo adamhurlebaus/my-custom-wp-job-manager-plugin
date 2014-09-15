@@ -1,8 +1,10 @@
 <?php
 /**
  * Plugin Name: WP Job Manager - My Custom Content
+ * Plugin URI:  http://www.multi-bids.com
  * Description: A modification of Astoundify's first Pre-Defined Regions Plugin.  Loads my custom content to WP Job Manager
  * Author:      Adam Hurlebaus
+ * Author URI:  http://www.multi-bids.com
  * Version:     1.0.2
  * Text Domain: mcjm
  */
@@ -67,12 +69,12 @@ class My_Custom_Job_Manager_Content {
 	 */
 	private function setup_actions() {
 		add_action( 'init', array( $this, 'register_post_taxonomy' ) );
-		add_filter( 'submit_job_form_fields', array( $this, 'form_fields' ) );
+	    add_filter( 'submit_job_form_fields', array( $this, 'form_fields' ) );
 		add_action( 'job_manager_update_job_data', array( $this, 'update_job_data' ), 10, 2 );
 		add_filter( 'submit_job_form_fields_get_job_data', array( $this, 'form_fields_get_job_data' ), 10, 2 );
 		add_filter( 'job_manager_job_listing_data_fields', array( $this, 'job_listing_data_fields' ) );
 		add_action( 'single_job_listing_meta_end', array( $this, 'display_custom_property_type' ) );
-		add_action( 'submit_job_form_job_fields_end', array( $this, 'add_property_fileds_to_submit' ) );
+		add_action( 'submit_job_form_job_fields_end', array( $this, 'add_property_fileds_to_submit', 11 ) );
 
 		$this->load_textdomain();
 	}
@@ -136,7 +138,7 @@ class My_Custom_Job_Manager_Content {
 	 * @since 1.0
 	 */
 	function form_fields( $fields ) {
-		$fields[ 'property' ][ 'property_type' ] = array(
+	  	$fields[ 'property' ][ 'property_type' ] = array(
 			'label'       => __( 'Property Type', 'job_manager' ),
 			'type'        => 'select',
 			'options'     => mcjm_get_properties_simple(),
@@ -159,6 +161,7 @@ class My_Custom_Job_Manager_Content {
 		);
 
 		return $fields;
+	  
 	}
 
 	/**
@@ -189,7 +192,7 @@ class My_Custom_Job_Manager_Content {
 		$term   = get_term_by( 'slug', $property, 'job_listing_property_type' );
 
 		wp_set_post_terms( $job_id, array( $term->term_id ), 'job_listing_property_type', false );
-		
+	  
 	}
 
 
@@ -221,14 +224,18 @@ class My_Custom_Job_Manager_Content {
 
 		$property_fields = WP_Job_Manager_Form_Submit_Job::$fields['property'];
 
-		foreach ( $property_fields as $key => $field ) : ?>
-			<fieldset class="fieldset-<?php esc_attr_e( $key ); ?>">
-				<label for="<?php esc_attr_e( $key ); ?>"><?php echo $field['label'] . apply_filters( 'submit_job_form_required_label', $field['required'] ? '' : ' <small>' . __( '(optional)', 'wp-job-manager' ) . '</small>', $field ); ?></label>
-				<div class="field <?php echo $field['required'] ? 'required-field' : ''; ?>">
-					<?php get_job_manager_template( 'form-fields/' . $field['type'] . '-field.php', array( 'key' => $key, 'field' => $field ) ); ?>
-				</div>
-			</fieldset>
-		<?php endforeach;
+		if ( $property_fields ) : ?>
+			<h2><?php _e( 'Property Details', 'wp-job-manager' ); ?></h2>
+
+	  		<?php foreach ( $property_fields as $key => $field ) : ?>
+				<fieldset class="fieldset-<?php esc_attr_e( $key ); ?>">
+					<label for="<?php esc_attr_e( $key ); ?>"><?php echo $field['label'] . apply_filters( 'submit_job_form_required_label', $field['required'] ? '' : ' <small>' . __( '(optional)', 'wp-job-manager' ) . '</small>', $field ); ?></label>
+					<div class="field <?php echo $field['required'] ? 'required-field' : ''; ?>">
+						<?php get_job_manager_template( 'form-fields/' . $field['type'] . '-field.php', array( 'key' => $key, 'field' => $field ) ); ?>
+					</div>
+				</fieldset>
+			<?php endforeach;
+	  	endif;
 	}
 
 	/**
